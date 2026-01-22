@@ -1,24 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Sci-Fi Code Lab</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body class="cyber">
+<body>
 
 <canvas id="stars"></canvas>
 
 <header>
-  <h1>⚡ Galaxia Code Lab ⚡</h1>
+  <h1>⚡ Sci-Fi Code Lab ⚡</h1>
   <div class="controls">
+    <input id="room" placeholder="Room ID">
+    <button onclick="joinRoom()">👥 Join</button>
     <button onclick="runCode()">🚀 Run</button>
-    <button onclick="saveCode()">💾 Save</button>
-    <button onclick="toggleTheme()">🌌 Theme</button>
+    <button onclick="toggleFullscreen()">🖥 Fullscreen</button>
   </div>
 </header>
 
-<div class="editor-container">
+<div class="editor-container" id="editor">
   <textarea id="htmlCode" placeholder="HTML"></textarea>
   <textarea id="cssCode" placeholder="CSS"></textarea>
   <textarea id="jsCode" placeholder="JavaScript"></textarea>
@@ -29,6 +30,10 @@
 
 <h2>🖥 Console</h2>
 <pre id="console"></pre>
+
+<!-- 🔥 Firebase (COMPAT – REQUIRED) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script src="script.js"></script>
 </body>
