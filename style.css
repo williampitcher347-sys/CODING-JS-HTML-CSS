@@ -1,0 +1,51 @@
+body {
+  background: radial-gradient(circle at top, #0f2027, #000);
+  color: #00ffff;
+  font-family: "Orbitron", monospace;
+  text-align: center;
+  padding: 20px;
+}
+
+h1 {
+  text-shadow: 0 0 10px #00ffff;
+}
+
+.editor-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+textarea {
+  background: #020b13;
+  color: #00ffcc;
+  border: 1px solid #00ffff;
+  height: 150px;
+  padding: 10px;
+  resize: none;
+  box-shadow: 0 0 10px #00ffff44;
+}
+
+button {
+  background: black;
+  color: #00ffff;
+  border: 2px solid #00ffff;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  box-shadow: 0 0 15px #00ffff;
+}
+
+button:hover {
+  background: #00ffff;
+  color: black;
+}
+
+iframe {
+  width: 100%;
+  height: 250px;
+  margin-top: 20px;
+  border: 2px solid #00ffff;
+  background: white;
+}
