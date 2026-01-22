@@ -5,20 +5,31 @@
   <title>Sci-Fi Code Lab</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="cyber">
 
+<canvas id="stars"></canvas>
+
+<header>
   <h1>⚡ Sci-Fi Code Lab ⚡</h1>
-
-  <div class="editor-container">
-    <textarea id="htmlCode" placeholder="Write HTML here..."></textarea>
-    <textarea id="cssCode" placeholder="Write CSS here..."></textarea>
-    <textarea id="jsCode" placeholder="Write JavaScript here..."></textarea>
+  <div class="controls">
+    <button onclick="runCode()">🚀 Run</button>
+    <button onclick="saveCode()">💾 Save</button>
+    <button onclick="toggleTheme()">🌌 Theme</button>
   </div>
+</header>
 
-  <button onclick="runCode()">🚀 Run Code</button>
+<div class="editor-container">
+  <textarea id="htmlCode" placeholder="HTML"></textarea>
+  <textarea id="cssCode" placeholder="CSS"></textarea>
+  <textarea id="jsCode" placeholder="JavaScript"></textarea>
+</div>
 
-  <iframe id="output"></iframe>
+<h2>🧪 Output</h2>
+<iframe id="output"></iframe>
 
-  <script src="script.js"></script>
+<h2>🖥 Console</h2>
+<pre id="console"></pre>
+
+<script src="script.js"></script>
 </body>
 </html>
