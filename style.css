@@ -6,8 +6,8 @@ body {
   margin: 0;
   background: black;
   color: #00ffff;
-  font-family: "Orbitron", monospace;
-  overflow-x: hidden;
+  font-family: monospace;
+  text-align: center;
 }
 
 canvas {
@@ -17,16 +17,19 @@ canvas {
 }
 
 header {
-  text-align: center;
   padding: 20px;
 }
 
-h1 {
-  text-shadow: 0 0 15px #00ffff;
+.controls {
+  margin-top: 10px;
 }
 
-.controls button {
-  margin: 5px;
+input, button {
+  background: black;
+  color: #00ffff;
+  border: 1px solid #00ffff;
+  padding: 8px;
+  margin: 4px;
 }
 
 .editor-container {
@@ -43,28 +46,11 @@ textarea {
   border: 1px solid #00ffff;
   padding: 10px;
   resize: none;
-  box-shadow: 0 0 10px #00ffff44;
-}
-
-button {
-  background: black;
-  color: #00ffff;
-  border: 2px solid #00ffff;
-  padding: 10px 16px;
-  cursor: pointer;
-  box-shadow: 0 0 10px #00ffff;
-}
-
-button:hover {
-  background: #00ffff;
-  color: black;
 }
 
 iframe {
   width: 95%;
   height: 260px;
-  margin: 10px auto;
-  display: block;
   border: 2px solid #00ffff;
   background: white;
 }
@@ -72,26 +58,8 @@ iframe {
 pre {
   width: 95%;
   margin: auto;
-  padding: 10px;
   background: #010a12;
   color: #00ff88;
-  border: 1px solid #00ffff;
+  padding: 10px;
   min-height: 120px;
-  overflow-y: auto;
-}
-
-/* SPACE THEME */
-body.space {
-  color: #aab7ff;
-}
-
-body.space textarea {
-  color: #cfd8ff;
-  border-color: #8899ff;
-}
-
-body.space button {
-  color: #8899ff;
-  border-color: #8899ff;
-  box-shadow: 0 0 10px #8899ff;
 }
