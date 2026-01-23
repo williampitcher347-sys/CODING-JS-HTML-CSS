@@ -128,3 +128,19 @@ const cssCode = document.getElementById("cssCode");
 const jsCode = document.getElementById("jsCode");
 const output = document.getElementById("output");
 const consoleBox = document.getElementById("console");
+
+/* ================= LOCAL SAVE ================= */
+
+function saveLocal() {
+  localStorage.setItem("scifi-html", htmlCode.value);
+  localStorage.setItem("scifi-css", cssCode.value);
+  localStorage.setItem("scifi-js", jsCode.value);
+  alert("Saved locally 🚀");
+}
+
+function loadLocal() {
+  htmlCode.value = localStorage.getItem("scifi-html") || "";
+  cssCode.value = localStorage.getItem("scifi-css") || "";
+  jsCode.value = localStorage.getItem("scifi-js") || "";
+  alert("Loaded local save 📂");
+}
