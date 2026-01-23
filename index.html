@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Sci-Fi Code Lab</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -13,18 +13,30 @@
   <h1>⚡ Sci-Fi Code Lab ⚡</h1>
   <div class="controls">
     <input id="room" placeholder="Room ID">
-    <button onclick="saveLocal()">💾 Save</button>
-    <button onclick="loadLocal()">📂 Load</button>
     <button onclick="joinRoom()">👥 Join</button>
     <button onclick="runCode()">🚀 Run</button>
-    <button onclick="toggleFullscreen()">🖥 Fullscreen</button>
+    <button onclick="saveLocal()">💾 Save</button>
+    <button onclick="loadLocal()">📂 Load</button>
+    <button onclick="toggleFullscreen()">🖥 Full</button>
   </div>
 </header>
 
-<div class="editor-container" id="editor">
-  <textarea id="htmlCode" placeholder="HTML"></textarea>
-  <textarea id="cssCode" placeholder="CSS"></textarea>
-  <textarea id="jsCode" placeholder="JavaScript"></textarea>
+<div class="main">
+  <!-- EDITORS -->
+  <div class="editor-container" id="editor">
+    <textarea id="htmlCode" placeholder="HTML"></textarea>
+    <textarea id="cssCode" placeholder="CSS"></textarea>
+    <textarea id="jsCode" placeholder="JavaScript"></textarea>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat">
+    <h3>💬 Galactic Chat</h3>
+    <div id="messages"></div>
+    <input id="username" placeholder="Name">
+    <input id="chatInput" placeholder="Message">
+    <button onclick="sendMessage()">Send</button>
+  </div>
 </div>
 
 <h2>🧪 Output</h2>
@@ -33,7 +45,7 @@
 <h2>🖥 Console</h2>
 <pre id="console"></pre>
 
-<!-- 🔥 Firebase (COMPAT – REQUIRED) -->
+<!-- FIREBASE (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
