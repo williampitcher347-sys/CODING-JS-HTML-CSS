@@ -150,6 +150,8 @@
 
     <input id="username" placeholder="Name">
     <input id="chatInput" placeholder="Message">
+    const username = document.getElementById("username");
+    const chatInput = document.getElementById("chatInput");
     <button onclick="sendMessage()">Send</button>
   </div>
 
