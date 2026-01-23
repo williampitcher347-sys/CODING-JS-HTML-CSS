@@ -1,106 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <style>* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  background: black;
-  color: #00ffff;
-  font-family: monospace;
-  text-align: center;
-}
-
-canvas {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-}
-
-header { padding: 15px; }
-
-.controls input,
-.controls button {
-  background: black;
-  color: #00ffff;
-  border: 1px solid #00ffff;
-  padding: 6px;
-  margin: 3px;
-}
-
-.main {
-  display: grid;
-  grid-template-columns: 3fr 1fr;
-  gap: 10px;
-  padding: 10px;
-}
-
-.editor-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 10px;
-}
-
-textarea {
-  height: 180px;
-  background: #020b13;
-  color: #00ffcc;
-  border: 1px solid #00ffff;
-  padding: 8px;
-  resize: none;
-}
-
-.chat {
-  border: 1px solid #00ffff;
-  padding: 8px;
-  background: #010a12;
-  display: flex;
-  flex-direction: column;
-}
-
-#messages {
-  flex: 1;
-  overflow-y: auto;
-  border: 1px solid #00ffff;
-  margin-bottom: 6px;
-  padding: 5px;
-  text-align: left;
-}
-
-.chat input, .chat button {
-  margin-top: 4px;
-  background: black;
-  color: #00ffff;
-  border: 1px solid #00ffff;
-  padding: 6px;
-}
-
-iframe {
-  width: 95%;
-  height: 250px;
-  border: 2px solid #00ffff;
-  background: white;
-}
-
-pre {
-  width: 95%;
-  margin: auto;
-  background: #010a12;
-  color: #00ff88;
-  padding: 10px;
-  min-height: 120px;
-}
-</style>
   <meta charset="UTF-8">
-  <title>Sci-Fi Code Lab</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Galaxia Code Lab</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: black;
+      color: #00ffff;
+      font-family: monospace;
+      text-align: center;
+    }
+
+    canvas {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+    }
+
+    header { padding: 15px; }
+
+    .controls input,
+    .controls button {
+      background: black;
+      color: #00ffff;
+      border: 1px solid #00ffff;
+      padding: 6px;
+      margin: 3px;
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: 3fr 1fr;
+      gap: 10px;
+      padding: 10px;
+    }
+
+    .editor-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+    }
+
+    textarea {
+      height: 180px;
+      background: #020b13;
+      color: #00ffcc;
+      border: 1px solid #00ffff;
+      padding: 8px;
+      resize: none;
+    }
+
+    iframe {
+      width: 95%;
+      height: 250px;
+      border: 2px solid #00ffff;
+      background: white;
+    }
+
+    pre {
+      width: 95%;
+      margin: auto;
+      background: #010a12;
+      color: #00ff88;
+      padding: 10px;
+      min-height: 120px;
+    }
+
+    /* CHAT */
+    .chat {
+      border: 1px solid #00ffff;
+      padding: 8px;
+      background: #010a12;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      border: 1px solid #00ffff;
+      margin-bottom: 6px;
+      padding: 5px;
+      text-align: left;
+    }
+
+    .users-box {
+      margin-bottom: 6px;
+      border: 1px solid #00ffff;
+      padding: 5px;
+      background: #000814;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    #users {
+      color: #00ffcc;
+      margin-top: 4px;
+    }
+
+    .chat input, .chat button {
+      margin-top: 4px;
+      background: black;
+      color: #00ffff;
+      border: 1px solid #00ffff;
+      padding: 6px;
+    }
+  </style>
 </head>
+
 <body>
 
 <canvas id="stars"></canvas>
 
 <header>
-  <h1>⚡ Galaxia CODE ⚡</h1>
+  <h1>⚡ GALAXIA CODE LABS ⚡</h1>
   <div class="controls">
     <input id="room" placeholder="Room ID">
     <button onclick="joinRoom()">👥 Join</button>
@@ -112,6 +129,7 @@ pre {
 </header>
 
 <div class="main">
+
   <!-- EDITORS -->
   <div class="editor-container" id="editor">
     <textarea id="htmlCode" placeholder="HTML"></textarea>
@@ -122,11 +140,19 @@ pre {
   <!-- CHAT -->
   <div class="chat">
     <h3>💬 Galactic Chat</h3>
+
     <div id="messages"></div>
+
+    <div class="users-box">
+      <strong>🧑‍🚀 Active Users</strong>
+      <div id="users"></div>
+    </div>
+
     <input id="username" placeholder="Name">
     <input id="chatInput" placeholder="Message">
     <button onclick="sendMessage()">Send</button>
   </div>
+
 </div>
 
 <h2>🧪 Output</h2>
@@ -135,7 +161,7 @@ pre {
 <h2>🖥 Console</h2>
 <pre id="console"></pre>
 
-<!-- FIREBASE (compat) -->
+<!-- FIREBASE (COMPAT) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
