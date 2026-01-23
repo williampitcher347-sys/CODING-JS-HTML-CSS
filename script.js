@@ -1,172 +1,178 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Sci-Fi Code Lab</title>
+/* ================= FIREBASE ================= */
 
-  <style>
-    * { box-sizing: border-box; }
+const firebaseConfig = {
+  apiKey: "AIzaSyCtgD_PlrPHwtdMnKVK8fSRnH6BGzag9aA",
+  authDomain: "multiplayer-fa20e.firebaseapp.com",
+  databaseURL: "https://multiplayer-fa20e-default-rtdb.firebaseio.com",
+  projectId: "multiplayer-fa20e",
+  storageBucket: "multiplayer-fa20e.appspot.com",
+  messagingSenderId: "693674994683",
+  appId: "1:693674994683:web:f65b2f698bbe5ca413795e"
+};
 
-    body {
-      margin: 0;
-      background: black;
-      color: #00ffff;
-      font-family: monospace;
-      text-align: center;
-    }
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-    canvas {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-    }
+let roomRef = null;
+let syncing = false;
 
-    header { padding: 15px; }
+/* ================= DOM ================= */
 
-    .controls input,
-    .controls button {
-      background: black;
-      color: #00ffff;
-      border: 1px solid #00ffff;
-      padding: 6px;
-      margin: 3px;
-    }
+const htmlCode = document.getElementById("htmlCode");
+const cssCode = document.getElementById("cssCode");
+const jsCode = document.getElementById("jsCode");
+const output = document.getElementById("output");
+const consoleBox = document.getElementById("console");
 
-    .main {
-      display: grid;
-      grid-template-columns: 3fr 1fr;
-      gap: 10px;
-      padding: 10px;
-    }
+const messagesDiv = document.getElementById("messages");
+const usersDiv = document.getElementById("users");
+const username = document.getElementById("username");
+const chatInput = document.getElementById("chatInput");
 
-    .editor-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 10px;
-    }
+/* ================= MULTIPLAYER ================= */
 
-    textarea {
-      height: 180px;
-      background: #020b13;
-      color: #00ffcc;
-      border: 1px solid #00ffff;
-      padding: 8px;
-      resize: none;
-    }
+function joinRoom() {
+  if (!room.value) return alert("Enter room ID");
 
-    iframe {
-      width: 95%;
-      height: 250px;
-      border: 2px solid #00ffff;
-      background: white;
-    }
+  roomRef = db.ref("rooms/" + room.value);
 
-    pre {
-      width: 95%;
-      margin: auto;
-      background: #010a12;
-      color: #00ff88;
-      padding: 10px;
-      min-height: 120px;
-    }
+  roomRef.on("value", snap => {
+    if (!snap.val() || syncing) return;
+    htmlCode.value = snap.val().html || "";
+    cssCode.value = snap.val().css || "";
+    jsCode.value = snap.val().js || "";
+  });
 
-    /* CHAT */
-    .chat {
-      border: 1px solid #00ffff;
-      padding: 8px;
-      background: #010a12;
-      display: flex;
-      flex-direction: column;
-    }
+  alert("Joined room " + room.value);
+}
 
-    #messages {
-      flex: 1;
-      overflow-y: auto;
-      border: 1px solid #00ffff;
-      margin-bottom: 6px;
-      padding: 5px;
-      text-align: left;
-    }
+function syncCode() {
+  if (!roomRef) return;
+  syncing = true;
+  roomRef.set({
+    html: htmlCode.value,
+    css: cssCode.value,
+    js: jsCode.value
+  });
+  syncing = false;
+}
 
-    .users-box {
-      margin-bottom: 6px;
-      border: 1px solid #00ffff;
-      padding: 5px;
-      background: #000814;
-      font-size: 12px;
-      text-align: left;
-    }
+[htmlCode, cssCode, jsCode].forEach(el =>
+  el.addEventListener("input", syncCode)
+);
 
-    #users {
-      color: #00ffcc;
-      margin-top: 4px;
-    }
+/* ================= RUN CODE ================= */
 
-    .chat input, .chat button {
-      margin-top: 4px;
-      background: black;
-      color: #00ffff;
-      border: 1px solid #00ffff;
-      padding: 6px;
-    }
-  </style>
-</head>
+function runCode() {
+  consoleBox.textContent = "";
+  output.srcdoc =
+    htmlCode.value +
+    `<style>${cssCode.value}</style>` +
+    `<script>
+      console.log = (...a)=>parent.logToConsole(a.join(" "));
+      ${jsCode.value}
+    <\/script>`;
+}
 
-<body>
+function logToConsole(msg) {
+  consoleBox.textContent += msg + "\n";
+}
 
-<canvas id="stars"></canvas>
+/* ================= LOCAL SAVE ================= */
 
-<header>
-  <h1>⚡ Sci-Fi Code Lab ⚡</h1>
-  <div class="controls">
-    <input id="room" placeholder="Room ID">
-    <button onclick="joinRoom()">👥 Join</button>
-    <button onclick="runCode()">🚀 Run</button>
-    <button onclick="saveLocal()">💾 Save</button>
-    <button onclick="loadLocal()">📂 Load</button>
-    <button onclick="toggleFullscreen()">🖥 Full</button>
-  </div>
-</header>
+function saveLocal() {
+  localStorage.setItem("html", htmlCode.value);
+  localStorage.setItem("css", cssCode.value);
+  localStorage.setItem("js", jsCode.value);
+  alert("Saved 🚀");
+}
 
-<div class="main">
+function loadLocal() {
+  htmlCode.value = localStorage.getItem("html") || "";
+  cssCode.value = localStorage.getItem("css") || "";
+  jsCode.value = localStorage.getItem("js") || "";
+}
 
-  <!-- EDITORS -->
-  <div class="editor-container" id="editor">
-    <textarea id="htmlCode" placeholder="HTML"></textarea>
-    <textarea id="cssCode" placeholder="CSS"></textarea>
-    <textarea id="jsCode" placeholder="JavaScript"></textarea>
-  </div>
+/* ================= FULLSCREEN ================= */
 
-  <!-- CHAT -->
-  <div class="chat">
-    <h3>💬 Galactic Chat</h3>
+function toggleFullscreen() {
+  const el = document.getElementById("editor");
+  document.fullscreenElement
+    ? document.exitFullscreen()
+    : el.requestFullscreen();
+}
 
-    <div id="messages"></div>
+/* ================= CHAT ================= */
 
-    <div class="users-box">
-      <strong>🧑‍🚀 Active Users</strong>
-      <div id="users"></div>
-    </div>
+const CHAT_API =
+  "https://696fdb3ca06046ce61880d4c.mockapi.io/Galaxia-messages";
 
-    <input id="username" placeholder="Name">
-    <input id="chatInput" placeholder="Message">
-    const username = document.getElementById("username");
-    const chatInput = document.getElementById("chatInput");
-    <button onclick="sendMessage()">Send</button>
-  </div>
+async function loadMessages() {
+  const res = await fetch(CHAT_API);
+  const data = await res.json();
 
-</div>
+  messagesDiv.innerHTML = "";
+  usersDiv.innerHTML = "";
 
-<h2>🧪 Output</h2>
-<iframe id="output"></iframe>
+  const users = new Set();
 
-<h2>🖥 Console</h2>
-<pre id="console"></pre>
+  data.slice(-50).forEach(m => {
+    messagesDiv.innerHTML += `<div><b>${m.user}:</b> ${m.text}</div>`;
+    users.add(m.user);
+  });
 
-<!-- FIREBASE (COMPAT) -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  users.forEach(u => {
+    usersDiv.innerHTML += `<div>• ${u}</div>`;
+  });
 
-<script src="script.js"></script>
-</body>
-</html>
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+async function sendMessage() {
+  const user = username.value || "Anon";
+  const text = chatInput.value.trim();
+  if (!text) return;
+
+  await fetch(CHAT_API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ user, text })
+  });
+
+  chatInput.value = "";
+  loadMessages();
+}
+
+setInterval(loadMessages, 2000);
+loadMessages();
+
+/* ================= STARS BACKGROUND ================= */
+
+const canvas = document.getElementById("stars");
+const ctx = canvas.getContext("2d");
+
+function resize() {
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+}
+resize();
+window.onresize = resize;
+
+const stars = Array.from({ length: 120 }, () => ({
+  x: Math.random() * canvas.width,
+  y: Math.random() * canvas.height,
+  r: Math.random() * 2
+}));
+
+(function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#00ffff";
+  stars.forEach(s => {
+    s.y += 0.4;
+    if (s.y > canvas.height) s.y = 0;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  requestAnimationFrame(animate);
+})();
