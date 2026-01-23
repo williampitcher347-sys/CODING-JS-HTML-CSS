@@ -1,161 +1,170 @@
-/* ================= FIREBASE ================= */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sci-Fi Code Lab</title>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCtgD_PlrPHwtdMnKVK8fSRnH6BGzag9aA",
-  authDomain: "multiplayer-fa20e.firebaseapp.com",
-  databaseURL: "https://multiplayer-fa20e-default-rtdb.firebaseio.com",
-  projectId: "multiplayer-fa20e",
-  storageBucket: "multiplayer-fa20e.appspot.com",
-  messagingSenderId: "693674994683",
-  appId: "1:693674994683:web:f65b2f698bbe5ca413795e"
-};
+  <style>
+    * { box-sizing: border-box; }
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+    body {
+      margin: 0;
+      background: black;
+      color: #00ffff;
+      font-family: monospace;
+      text-align: center;
+    }
 
-let roomRef = null;
-let syncing = false;
+    canvas {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+    }
 
-/* ================= DOM ================= */
+    header { padding: 15px; }
 
-const htmlCode = document.getElementById("htmlCode");
-const cssCode = document.getElementById("cssCode");
-const jsCode = document.getElementById("jsCode");
-const output = document.getElementById("output");
-const consoleBox = document.getElementById("console");
+    .controls input,
+    .controls button {
+      background: black;
+      color: #00ffff;
+      border: 1px solid #00ffff;
+      padding: 6px;
+      margin: 3px;
+    }
 
-/* ================= MULTIPLAYER ================= */
+    .main {
+      display: grid;
+      grid-template-columns: 3fr 1fr;
+      gap: 10px;
+      padding: 10px;
+    }
 
-function joinRoom() {
-  const roomId = room.value;
-  if (!roomId) return alert("Enter room ID");
+    .editor-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+    }
 
-  roomRef = db.ref("rooms/" + roomId);
+    textarea {
+      height: 180px;
+      background: #020b13;
+      color: #00ffcc;
+      border: 1px solid #00ffff;
+      padding: 8px;
+      resize: none;
+    }
 
-  roomRef.on("value", snap => {
-    if (!snap.val() || syncing) return;
-    htmlCode.value = snap.val().html || "";
-    cssCode.value = snap.val().css || "";
-    jsCode.value = snap.val().js || "";
-  });
+    iframe {
+      width: 95%;
+      height: 250px;
+      border: 2px solid #00ffff;
+      background: white;
+    }
 
-  alert("Joined room " + roomId);
-}
+    pre {
+      width: 95%;
+      margin: auto;
+      background: #010a12;
+      color: #00ff88;
+      padding: 10px;
+      min-height: 120px;
+    }
 
-function syncCode() {
-  if (!roomRef) return;
-  syncing = true;
-  roomRef.set({
-    html: htmlCode.value,
-    css: cssCode.value,
-    js: jsCode.value
-  });
-  syncing = false;
-}
+    /* CHAT */
+    .chat {
+      border: 1px solid #00ffff;
+      padding: 8px;
+      background: #010a12;
+      display: flex;
+      flex-direction: column;
+    }
 
-[htmlCode, cssCode, jsCode].forEach(el =>
-  el.addEventListener("input", syncCode)
-);
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      border: 1px solid #00ffff;
+      margin-bottom: 6px;
+      padding: 5px;
+      text-align: left;
+    }
 
-/* ================= RUN ================= */
+    .users-box {
+      margin-bottom: 6px;
+      border: 1px solid #00ffff;
+      padding: 5px;
+      background: #000814;
+      font-size: 12px;
+      text-align: left;
+    }
 
-function runCode() {
-  consoleBox.textContent = "";
-  output.srcdoc =
-    htmlCode.value +
-    `<style>${cssCode.value}</style>` +
-    `<script>
-      console.log = (...a)=>parent.logToConsole(a.join(" "));
-      ${jsCode.value}
-    <\/script>`;
-}
+    #users {
+      color: #00ffcc;
+      margin-top: 4px;
+    }
 
-function logToConsole(msg) {
-  consoleBox.textContent += msg + "\n";
-}
+    .chat input, .chat button {
+      margin-top: 4px;
+      background: black;
+      color: #00ffff;
+      border: 1px solid #00ffff;
+      padding: 6px;
+    }
+  </style>
+</head>
 
-/* ================= LOCAL SAVE ================= */
+<body>
 
-function saveLocal() {
-  localStorage.setItem("html", htmlCode.value);
-  localStorage.setItem("css", cssCode.value);
-  localStorage.setItem("js", jsCode.value);
-  alert("Saved 🚀");
-}
+<canvas id="stars"></canvas>
 
-function loadLocal() {
-  htmlCode.value = localStorage.getItem("html") || "";
-  cssCode.value = localStorage.getItem("css") || "";
-  jsCode.value = localStorage.getItem("js") || "";
-}
+<header>
+  <h1>⚡ Sci-Fi Code Lab ⚡</h1>
+  <div class="controls">
+    <input id="room" placeholder="Room ID">
+    <button onclick="joinRoom()">👥 Join</button>
+    <button onclick="runCode()">🚀 Run</button>
+    <button onclick="saveLocal()">💾 Save</button>
+    <button onclick="loadLocal()">📂 Load</button>
+    <button onclick="toggleFullscreen()">🖥 Full</button>
+  </div>
+</header>
 
-/* ================= FULLSCREEN ================= */
+<div class="main">
 
-function toggleFullscreen() {
-  const el = document.getElementById("editor");
-  document.fullscreenElement ? document.exitFullscreen() : el.requestFullscreen();
-}
+  <!-- EDITORS -->
+  <div class="editor-container" id="editor">
+    <textarea id="htmlCode" placeholder="HTML"></textarea>
+    <textarea id="cssCode" placeholder="CSS"></textarea>
+    <textarea id="jsCode" placeholder="JavaScript"></textarea>
+  </div>
 
-/* ================= CHAT ================= */
+  <!-- CHAT -->
+  <div class="chat">
+    <h3>💬 Galactic Chat</h3>
 
-const CHAT_API = "https://696fdb3ca06046ce61880d4c.mockapi.io/Galaxia-messages";
-const messagesDiv = document.getElementById("messages");
+    <div id="messages"></div>
 
-async function loadMessages() {
-  const res = await fetch(CHAT_API);
-  const data = await res.json();
-  messagesDiv.innerHTML = "";
-  data.slice(-50).forEach(m => {
-    messagesDiv.innerHTML += `<div><b>${m.user}:</b> ${m.text}</div>`;
-  });
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
-}
+    <div class="users-box">
+      <strong>🧑‍🚀 Active Users</strong>
+      <div id="users"></div>
+    </div>
 
-async function sendMessage() {
-  const user = username.value || "Anon";
-  const text = chatInput.value;
-  if (!text) return;
+    <input id="username" placeholder="Name">
+    <input id="chatInput" placeholder="Message">
+    <button onclick="sendMessage()">Send</button>
+  </div>
 
-  await fetch(CHAT_API, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ user, text })
-  });
+</div>
 
-  chatInput.value = "";
-  loadMessages();
-}
+<h2>🧪 Output</h2>
+<iframe id="output"></iframe>
 
-setInterval(loadMessages, 2000);
-loadMessages();
+<h2>🖥 Console</h2>
+<pre id="console"></pre>
 
-/* ================= STARS ================= */
+<!-- FIREBASE (COMPAT) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-const canvas = document.getElementById("stars");
-const ctx = canvas.getContext("2d");
-
-function resize() {
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
-}
-resize();
-window.onresize = resize;
-
-const stars = Array.from({ length: 120 }, () => ({
-  x: Math.random() * canvas.width,
-  y: Math.random() * canvas.height,
-  r: Math.random() * 2
-}));
-
-(function animate() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle = "#00ffff";
-  stars.forEach(s => {
-    s.y += 0.4;
-    if (s.y > canvas.height) s.y = 0;
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    ctx.fill();
-  });
-  requestAnimationFrame(animate);
-})();
+<script src="script.js"></script>
+</body>
+</html>
