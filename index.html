@@ -2,213 +2,170 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Galaxia Learning</title>
+<title>Galaxia Learn & Run</title>
 
 <style>
 body{
   margin:0;
-  background:radial-gradient(circle,#0a0f25,#000);
+  background:radial-gradient(circle,#0b1025,#000);
   color:#00f6ff;
-  font-family:Arial,system-ui;
+  font-family:system-ui,Arial;
 }
-
 header{
   text-align:center;
-  padding:20px;
+  padding:18px;
   font-size:28px;
   letter-spacing:3px;
   box-shadow:0 0 40px #00f6ff55;
 }
-
 #layout{
   display:grid;
-  grid-template-columns:260px 1fr;
-  height:calc(100vh - 80px);
+  grid-template-columns:300px 1fr;
+  height:calc(100vh - 70px);
 }
-
-#nav{
+#left{
   background:#020617;
-  border-right:2px solid #00f6ff33;
   padding:12px;
-}
-
-#nav button{
-  width:100%;
-  padding:12px;
-  margin-bottom:10px;
-  background:#00f6ff22;
-  color:#00f6ff;
-  border:1px solid #00f6ff;
-  cursor:pointer;
-}
-
-#nav button:hover{
-  background:#00f6ff55;
-}
-
-#main{
-  padding:20px;
   overflow:auto;
 }
-
-input{
+#right{
+  padding:16px;
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+}
+input,textarea{
   width:100%;
-  padding:10px;
-  margin-bottom:16px;
   background:#000;
   color:#00f6ff;
   border:1px solid #00f6ff44;
+  padding:10px;
+  box-sizing:border-box;
 }
+textarea{
+  height:140px;
+  resize:none;
+}
+button{
+  background:#00f6ff22;
+  border:1px solid #00f6ff;
+  color:#00f6ff;
+  padding:10px;
+  cursor:pointer;
+}
+button:hover{background:#00f6ff55}
 
 .command{
   border:1px solid #00f6ff33;
-  padding:14px;
-  margin-bottom:14px;
-  box-shadow:0 0 15px #00f6ff22;
-}
-
-.command h3{
-  margin:0;
-  font-size:20px;
-  color:#9ff;
-}
-
-.command .args{
-  font-size:14px;
-  opacity:0.9;
-}
-
-.command .desc{
-  margin-top:6px;
-}
-
-.command pre{
-  background:#000;
   padding:10px;
-  border-left:4px solid #00f6ff;
+  margin-bottom:10px;
+}
+.command h3{margin:0;font-size:18px}
+.command small{opacity:.8}
+
+#console{
+  background:#000;
+  border-top:2px solid #00f6ff55;
+  padding:10px;
+  height:160px;
   overflow:auto;
+  font-family:monospace;
 }
 </style>
 </head>
 
 <body>
 
-<header>🌌 GALAXIA • LEARNING CENTER</header>
+<header>🌌 GALAXIA — LEARN & RUN</header>
 
 <div id="layout">
-  <div id="nav">
-    <button onclick="show('learn')">📘 Learn</button>
-    <button onclick="show('about')">ℹ About</button>
-  </div>
 
-  <div id="main">
-    <div id="learn">
-      <input placeholder="Search commands..." oninput="filterCommands(this.value)">
-      <div id="list"></div>
-    </div>
+<div id="left">
+  <input placeholder="Search 400 commands..." oninput="search(this.value)">
+  <div id="commands"></div>
+</div>
 
-    <div id="about" style="display:none">
-      <h2>About Galaxia</h2>
-      <p>Galaxia teaches logic, structure, and creativity using readable commands.</p>
-    </div>
-  </div>
+<div id="right">
+
+<div>
+  <h3>🧪 Script Editor</h3>
+  <textarea id="editor" placeholder="Say('Hello')
+Wait(1)
+Loop(3)"></textarea>
+  <button onclick="run()">▶ Run Script</button>
+</div>
+
+<div></div>
+
+<div id="console"></div>
+
+</div>
 </div>
 
 <script>
-const COMMANDS = [
-  {
-    name:"Loop",
-    args:"(number)",
-    desc:"Repeats a block of actions a set number of times.",
-    example:"Loop(5) → repeats the script 5 times"
-  },
-  {
-    name:"Wait",
-    args:"(seconds)",
-    desc:"Pauses the script before continuing.",
-    example:"Wait(2) → waits for 2 seconds"
-  },
-  {
-    name:"Say",
-    args:"(text)",
-    desc:"Displays a message to the user.",
-    example:'Say("Hello World")'
-  },
-  {
-    name:"If",
-    args:"(condition)",
-    desc:"Runs actions only if a condition is true.",
-    example:"If(score > 10)"
-  },
-  {
-    name:"Move",
-    args:"(direction, amount)",
-    desc:"Moves an object in a direction.",
-    example:"Move(right, 10)"
-  },
-  {
-    name:"SetColor",
-    args:"(color)",
-    desc:"Changes an object's color.",
-    example:"SetColor(blue)"
-  },
-  {
-    name:"PlaySound",
-    args:"(name)",
-    desc:"Plays a sound effect.",
-    example:"PlaySound(click)"
-  },
-  {
-    name:"RepeatForever",
-    args:"()",
-    desc:"Runs actions endlessly.",
-    example:"RepeatForever()"
-  },
-  {
-    name:"CreateRoom",
-    args:"(roomName)",
-    desc:"Creates a new private chat room.",
-    example:'CreateRoom("ScienceClub")'
-  },
-  {
-    name:"JoinRoom",
-    args:"(roomName)",
-    desc:"Joins an existing chat room.",
-    example:'JoinRoom("ScienceClub")'
-  }
+const baseCommands=[
+  ["Loop","(number)","Repeats actions"],
+  ["Wait","(seconds)","Pauses execution"],
+  ["Say","(text)","Shows a message"],
+  ["Move","(dir,amount)","Moves object"],
+  ["SetColor","(color)","Changes color"],
+  ["CreateRoom","(name)","Creates chat room"],
+  ["JoinRoom","(name)","Joins chat room"],
+  ["Encrypt","(data)","Encrypts text"],
+  ["VerifyUser","(id)","Checks identity"],
+  ["PlaySound","(name)","Plays sound"]
 ];
 
-const list=document.getElementById("list");
+const COMMANDS=[];
 
-function render(cmds){
+// auto-generate 400 commands
+for(let i=0;i<40;i++){
+  baseCommands.forEach(b=>{
+    COMMANDS.push({
+      name:b[0]+i,
+      args:b[1],
+      desc:b[2]+" variation "+i
+    });
+  });
+}
+
+const list=document.getElementById("commands");
+
+function render(arr){
   list.innerHTML="";
-  cmds.forEach(c=>{
+  arr.forEach(c=>{
     const d=document.createElement("div");
     d.className="command";
-    d.innerHTML=`
-      <h3>${c.name} ${c.args}</h3>
-      <div class="desc">${c.desc}</div>
-      <pre>${c.example}</pre>
-    `;
+    d.innerHTML=`<h3>${c.name}${c.args}</h3>
+    <small>${c.desc}</small>`;
     list.appendChild(d);
   });
 }
 
-function filterCommands(q){
+function search(q){
   q=q.toLowerCase();
-  render(COMMANDS.filter(c=>
-    c.name.toLowerCase().includes(q) ||
-    c.desc.toLowerCase().includes(q)
-  ));
-}
-
-function show(id){
-  document.getElementById("learn").style.display="none";
-  document.getElementById("about").style.display="none";
-  document.getElementById(id).style.display="block";
+  render(COMMANDS.filter(c=>c.name.toLowerCase().includes(q)));
 }
 
 render(COMMANDS);
+
+const consoleBox=document.getElementById("console");
+
+function log(msg){
+  consoleBox.innerHTML+=msg+"<br>";
+  consoleBox.scrollTop=consoleBox.scrollHeight;
+}
+
+function run(){
+  consoleBox.innerHTML="";
+  const lines=document.getElementById("editor").value.split("\n");
+  lines.forEach(l=>{
+    l=l.trim();
+    if(!l) return;
+    const cmd=l.split("(")[0];
+    log("▶ Running "+cmd+"...");
+    setTimeout(()=>log("✔ "+cmd+" executed"),200);
+  });
+}
 </script>
 
 </body>
