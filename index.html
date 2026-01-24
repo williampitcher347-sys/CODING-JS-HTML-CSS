@@ -2,29 +2,29 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Galaxia Learn & Run</title>
+<title>Galaxia Learn</title>
 
 <style>
 body{
   margin:0;
-  background:radial-gradient(circle,#0b1025,#000);
+  background:#020617;
   color:#00f6ff;
-  font-family:system-ui,Arial;
+  font-family:system-ui;
 }
 header{
+  padding:20px;
   text-align:center;
-  padding:18px;
   font-size:28px;
   letter-spacing:3px;
   box-shadow:0 0 40px #00f6ff55;
 }
-#layout{
+#app{
   display:grid;
-  grid-template-columns:300px 1fr;
-  height:calc(100vh - 70px);
+  grid-template-columns:320px 1fr;
+  height:calc(100vh - 80px);
 }
 #left{
-  background:#020617;
+  border-right:2px solid #00f6ff22;
   padding:12px;
   overflow:auto;
 }
@@ -39,12 +39,8 @@ input,textarea{
   color:#00f6ff;
   border:1px solid #00f6ff44;
   padding:10px;
-  box-sizing:border-box;
 }
-textarea{
-  height:140px;
-  resize:none;
-}
+textarea{height:160px}
 button{
   background:#00f6ff22;
   border:1px solid #00f6ff;
@@ -52,19 +48,14 @@ button{
   padding:10px;
   cursor:pointer;
 }
-button:hover{background:#00f6ff55}
-
 .command{
   border:1px solid #00f6ff33;
-  padding:10px;
   margin-bottom:10px;
+  padding:10px;
 }
-.command h3{margin:0;font-size:18px}
-.command small{opacity:.8}
-
+.command h3{margin:0}
 #console{
   background:#000;
-  border-top:2px solid #00f6ff55;
   padding:10px;
   height:160px;
   overflow:auto;
@@ -75,95 +66,92 @@ button:hover{background:#00f6ff55}
 
 <body>
 
-<header>🌌 GALAXIA — LEARN & RUN</header>
+<header>🌌 GALAXIA LEARNING CORE</header>
 
-<div id="layout">
+<div id="app">
 
 <div id="left">
-  <input placeholder="Search 400 commands..." oninput="search(this.value)">
-  <div id="commands"></div>
+<input placeholder="Search commands..." oninput="search(this.value)">
+<div id="list"></div>
 </div>
 
 <div id="right">
-
 <div>
-  <h3>🧪 Script Editor</h3>
-  <textarea id="editor" placeholder="Say('Hello')
+<h3>🧪 Script Editor</h3>
+<textarea id="editor">
+Say("Hello")
 Wait(1)
-Loop(3)"></textarea>
-  <button onclick="run()">▶ Run Script</button>
+CreateRoom("Test")
+</textarea>
+<button onclick="run()">▶ Run</button>
 </div>
 
 <div></div>
 
 <div id="console"></div>
-
 </div>
+
 </div>
 
 <script>
-const baseCommands=[
-  ["Loop","(number)","Repeats actions"],
-  ["Wait","(seconds)","Pauses execution"],
-  ["Say","(text)","Shows a message"],
-  ["Move","(dir,amount)","Moves object"],
-  ["SetColor","(color)","Changes color"],
-  ["CreateRoom","(name)","Creates chat room"],
-  ["JoinRoom","(name)","Joins chat room"],
-  ["Encrypt","(data)","Encrypts text"],
-  ["VerifyUser","(id)","Checks identity"],
-  ["PlaySound","(name)","Plays sound"]
+const COMMANDS=[
+  {name:"Loop",args:"(times)",desc:"Repeat actions"},
+  {name:"If",args:"(condition)",desc:"Conditional execution"},
+  {name:"Stop",args:"()",desc:"Stops script"},
+  {name:"Wait",args:"(seconds)",desc:"Pause execution"},
+  {name:"Delay",args:"(ms)",desc:"Delay action"},
+  {name:"Say",args:"(text)",desc:"Send chat message"},
+  {name:"Broadcast",args:"(text)",desc:"Send message to everyone"},
+  {name:"ClearChat",args:"()",desc:"Clear chat history"},
+  {name:"CreateRoom",args:"(name)",desc:"Create a room"},
+  {name:"JoinRoom",args:"(name)",desc:"Join a room"},
+  {name:"LeaveRoom",args:"()",desc:"Leave room"},
+  {name:"ListRooms",args:"()",desc:"Show rooms"},
+  {name:"SetName",args:"(name)",desc:"Set username"},
+  {name:"GetUserID",args:"()",desc:"Return user ID"},
+  {name:"IsAdmin",args:"()",desc:"Check admin"},
+  {name:"KickUser",args:"(id)",desc:"Kick a user"},
+  {name:"BanUser",args:"(id)",desc:"Ban user"},
+  {name:"SetTheme",args:"(theme)",desc:"Change UI theme"},
+  {name:"SetColor",args:"(color)",desc:"Change color"},
+  {name:"Save",args:"(key,value)",desc:"Save data"},
+  {name:"Load",args:"(key)",desc:"Load data"},
+  {name:"Delete",args:"(key)",desc:"Delete data"},
+  {name:"PlaySound",args:"(name)",desc:"Play sound"},
+  {name:"Mute",args:"()",desc:"Mute sound"}
 ];
 
-const COMMANDS=[];
-
-// auto-generate 400 commands
-for(let i=0;i<40;i++){
-  baseCommands.forEach(b=>{
-    COMMANDS.push({
-      name:b[0]+i,
-      args:b[1],
-      desc:b[2]+" variation "+i
-    });
-  });
-}
-
-const list=document.getElementById("commands");
-
+const list=document.getElementById("list");
 function render(arr){
   list.innerHTML="";
   arr.forEach(c=>{
     const d=document.createElement("div");
     d.className="command";
-    d.innerHTML=`<h3>${c.name}${c.args}</h3>
-    <small>${c.desc}</small>`;
+    d.innerHTML=`<h3>${c.name}${c.args}</h3><small>${c.desc}</small>`;
+    d.onclick=()=>insert(c.name);
     list.appendChild(d);
   });
 }
-
 function search(q){
   q=q.toLowerCase();
   render(COMMANDS.filter(c=>c.name.toLowerCase().includes(q)));
 }
-
+function insert(name){
+  editor.value+=`\n${name}()`;
+}
 render(COMMANDS);
 
 const consoleBox=document.getElementById("console");
-
-function log(msg){
-  consoleBox.innerHTML+=msg+"<br>";
+function log(t){
+  consoleBox.innerHTML+=t+"<br>";
   consoleBox.scrollTop=consoleBox.scrollHeight;
 }
-
 function run(){
   consoleBox.innerHTML="";
-  const lines=document.getElementById("editor").value.split("\n");
-  lines.forEach(l=>{
-    l=l.trim();
-    if(!l) return;
-    const cmd=l.split("(")[0];
-    log("▶ Running "+cmd+"...");
-    setTimeout(()=>log("✔ "+cmd+" executed"),200);
+  editor.value.split("\n").forEach(line=>{
+    const cmd=line.split("(")[0].trim();
+    if(!cmd) return;
+    log("▶ "+cmd+" executed");
   });
 }
 </script>
