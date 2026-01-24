@@ -1,214 +1,214 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Galaxia Platform</title>
+<title>Galaxia Learning</title>
 
 <style>
-:root {
-  --neon:#00f6ff;
-  --bg:#020617;
-}
-
-body {
+body{
   margin:0;
-  font-family:Consolas, monospace;
-  background:radial-gradient(circle at top,#0b1020,#000);
-  color:var(--neon);
+  background:radial-gradient(circle,#0a0f25,#000);
+  color:#00f6ff;
+  font-family:Arial,system-ui;
 }
 
-header {
-  padding:16px;
+header{
   text-align:center;
-  font-size:26px;
+  padding:20px;
+  font-size:28px;
   letter-spacing:3px;
-  box-shadow:0 0 30px #00f6ff55;
+  box-shadow:0 0 40px #00f6ff55;
 }
 
-#layout {
+#layout{
   display:grid;
-  grid-template-columns:280px 1fr;
-  height:calc(100vh - 70px);
+  grid-template-columns:260px 1fr;
+  height:calc(100vh - 80px);
 }
 
-#sidebar {
-  background:#01040d;
+#nav{
+  background:#020617;
   border-right:2px solid #00f6ff33;
   padding:12px;
-  overflow-y:auto;
 }
 
-#main {
-  padding:16px;
-  overflow-y:auto;
-}
-
-button {
+#nav button{
   width:100%;
-  margin-bottom:8px;
-  padding:10px;
+  padding:12px;
+  margin-bottom:10px;
   background:#00f6ff22;
-  color:var(--neon);
-  border:1px solid var(--neon);
+  color:#00f6ff;
+  border:1px solid #00f6ff;
   cursor:pointer;
 }
 
-button:hover { background:#00f6ff44 }
+#nav button:hover{
+  background:#00f6ff55;
+}
 
-.panel {
-  padding:12px;
-  margin-bottom:12px;
+#main{
+  padding:20px;
+  overflow:auto;
+}
+
+input{
+  width:100%;
+  padding:10px;
+  margin-bottom:16px;
+  background:#000;
+  color:#00f6ff;
+  border:1px solid #00f6ff44;
+}
+
+.command{
   border:1px solid #00f6ff33;
+  padding:14px;
+  margin-bottom:14px;
   box-shadow:0 0 15px #00f6ff22;
 }
 
-.hidden { display:none }
-
-input {
-  width:100%;
-  padding:8px;
-  margin-bottom:10px;
-  background:#020617;
-  color:var(--neon);
-  border:1px solid #00f6ff33;
+.command h3{
+  margin:0;
+  font-size:20px;
+  color:#9ff;
 }
 
-.func {
-  border:1px solid #00f6ff22;
-  padding:8px;
-  margin-bottom:6px;
-  cursor:pointer;
+.command .args{
+  font-size:14px;
+  opacity:0.9;
 }
 
-.func:hover { background:#00f6ff11 }
+.command .desc{
+  margin-top:6px;
+}
 
-.func b { color:#9ff }
-
-.category {
-  margin-top:14px;
-  font-size:18px;
-  border-bottom:1px solid #00f6ff33;
+.command pre{
+  background:#000;
+  padding:10px;
+  border-left:4px solid #00f6ff;
+  overflow:auto;
 }
 </style>
 </head>
 
 <body>
 
-<header>🌌 GALAXIA • 400 FUNCTION LEARNING PLATFORM</header>
+<header>🌌 GALAXIA • LEARNING CENTER</header>
 
 <div id="layout">
-  <div id="sidebar">
-    <button onclick="show('home')">🏠 Home</button>
-    <button onclick="show('learn')">📘 Learning</button>
-    <button onclick="show('system')">🛡 System</button>
+  <div id="nav">
+    <button onclick="show('learn')">📘 Learn</button>
+    <button onclick="show('about')">ℹ About</button>
   </div>
 
   <div id="main">
-    <div id="home" class="panel">
-      <h2>Welcome to Galaxia</h2>
-      <p>Private • Secure • Experimental</p>
-      <p>Explore 400+ built-in platform functions.</p>
+    <div id="learn">
+      <input placeholder="Search commands..." oninput="filterCommands(this.value)">
+      <div id="list"></div>
     </div>
 
-    <div id="learn" class="panel hidden">
-      <h2>📘 Learning Center</h2>
-      <input id="search" placeholder="Search functions..." oninput="renderLearning()">
-      <div id="learningList"></div>
-    </div>
-
-    <div id="system" class="panel hidden">
-      <h2>System Status</h2>
-      <pre id="sysInfo"></pre>
+    <div id="about" style="display:none">
+      <h2>About Galaxia</h2>
+      <p>Galaxia teaches logic, structure, and creativity using readable commands.</p>
     </div>
   </div>
 </div>
 
 <script>
-/* =============================
-   NAVIGATION
-============================= */
-const pages=["home","learn","system"];
-function show(p){
-  pages.forEach(x=>document.getElementById(x).classList.add("hidden"));
-  document.getElementById(p).classList.remove("hidden");
-}
-
-/* =============================
-   FEATURE REGISTRY (400)
-============================= */
-const FEATURES = [];
-const categories = [
-  "system","ui","effect","data",
-  "net","user","page","security"
+const COMMANDS = [
+  {
+    name:"Loop",
+    args:"(number)",
+    desc:"Repeats a block of actions a set number of times.",
+    example:"Loop(5) → repeats the script 5 times"
+  },
+  {
+    name:"Wait",
+    args:"(seconds)",
+    desc:"Pauses the script before continuing.",
+    example:"Wait(2) → waits for 2 seconds"
+  },
+  {
+    name:"Say",
+    args:"(text)",
+    desc:"Displays a message to the user.",
+    example:'Say("Hello World")'
+  },
+  {
+    name:"If",
+    args:"(condition)",
+    desc:"Runs actions only if a condition is true.",
+    example:"If(score > 10)"
+  },
+  {
+    name:"Move",
+    args:"(direction, amount)",
+    desc:"Moves an object in a direction.",
+    example:"Move(right, 10)"
+  },
+  {
+    name:"SetColor",
+    args:"(color)",
+    desc:"Changes an object's color.",
+    example:"SetColor(blue)"
+  },
+  {
+    name:"PlaySound",
+    args:"(name)",
+    desc:"Plays a sound effect.",
+    example:"PlaySound(click)"
+  },
+  {
+    name:"RepeatForever",
+    args:"()",
+    desc:"Runs actions endlessly.",
+    example:"RepeatForever()"
+  },
+  {
+    name:"CreateRoom",
+    args:"(roomName)",
+    desc:"Creates a new private chat room.",
+    example:'CreateRoom("ScienceClub")'
+  },
+  {
+    name:"JoinRoom",
+    args:"(roomName)",
+    desc:"Joins an existing chat room.",
+    example:'JoinRoom("ScienceClub")'
+  }
 ];
 
-// generate 400 structured features
-categories.forEach(cat=>{
-  for(let i=1;i<=50;i++){
-    FEATURES.push({
-      name:`${cat}.${i}`,
-      category:cat,
-      description:`Performs ${cat} operation #${i}.`,
-      example:`${cat}.${i}()`
-    });
-  }
-});
+const list=document.getElementById("list");
 
-// real system example
-FEATURES.push({
-  name:"system.status",
-  category:"system",
-  description:"Shows system security and runtime status.",
-  example:"system.status()"
-});
-
-/* =============================
-   LEARNING PAGE RENDER
-============================= */
-const list=document.getElementById("learningList");
-function renderLearning(){
-  const q=document.getElementById("search").value.toLowerCase();
+function render(cmds){
   list.innerHTML="";
-
-  categories.forEach(cat=>{
-    const items=FEATURES.filter(f =>
-      f.category===cat &&
-      (f.name.includes(q) || f.description.includes(q))
-    );
-    if(!items.length) return;
-
-    const h=document.createElement("div");
-    h.className="category";
-    h.textContent=cat.toUpperCase();
-    list.appendChild(h);
-
-    items.forEach(f=>{
-      const d=document.createElement("div");
-      d.className="func";
-      d.innerHTML=`
-        <b>${f.name}</b><br>
-        ${f.description}<br>
-        <small>Example: ${f.example}</small>
-      `;
-      list.appendChild(d);
-    });
+  cmds.forEach(c=>{
+    const d=document.createElement("div");
+    d.className="command";
+    d.innerHTML=`
+      <h3>${c.name} ${c.args}</h3>
+      <div class="desc">${c.desc}</div>
+      <pre>${c.example}</pre>
+    `;
+    list.appendChild(d);
   });
 }
 
-/* =============================
-   SYSTEM PAGE
-============================= */
-document.getElementById("sysInfo").textContent =
-`Security: ENABLED
-Isolation: ON
-Tracking: OFF
-Functions Loaded: ${FEATURES.length}
-Time: ${new Date().toLocaleTimeString()}`;
+function filterCommands(q){
+  q=q.toLowerCase();
+  render(COMMANDS.filter(c=>
+    c.name.toLowerCase().includes(q) ||
+    c.desc.toLowerCase().includes(q)
+  ));
+}
 
-/* =============================
-   INIT
-============================= */
-renderLearning();
+function show(id){
+  document.getElementById("learn").style.display="none";
+  document.getElementById("about").style.display="none";
+  document.getElementById(id).style.display="block";
+}
+
+render(COMMANDS);
 </script>
 
 </body>
