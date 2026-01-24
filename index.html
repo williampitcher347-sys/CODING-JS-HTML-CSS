@@ -1,164 +1,299 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Sci-Fi Code Lab</title>
+<meta charset="UTF-8">
+<title>Galaxia Browser • GalaCode</title>
 
-  <style>
-    * { box-sizing: border-box; }
+<style>
+html, body {
+  margin: 0;
+  height: 100%;
+  background: radial-gradient(circle at top, #00131f, #000);
+  font-family: Orbitron, system-ui, sans-serif;
+  color: #0ff;
+  overflow: hidden;
+}
 
-    body {
-      margin: 0;
-      background: black;
-      color: #00ffff;
-      font-family: monospace;
-      text-align: center;
-    }
+/* ===== GLOBAL EFFECTS ===== */
+.glow * {
+  text-shadow: 0 0 8px #0ff;
+}
+.hidden { display: none; }
 
-    canvas {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-    }
+/* ===== TOP BAR ===== */
+.top {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background: rgba(0,20,35,.9);
+  border-bottom: 1px solid #0ff;
+}
 
-    header { padding: 15px; }
+.top h1 {
+  font-size: 18px;
+  margin: 0;
+  flex: 1;
+}
 
-    .controls input,
-    .controls button {
-      background: black;
-      color: #00ffff;
-      border: 1px solid #00ffff;
-      padding: 6px;
-      margin: 3px;
-    }
+/* ===== LAYOUT ===== */
+.app {
+  display: flex;
+  height: calc(100% - 52px);
+}
 
-    /* EDITORS */
-    .editor-container {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      padding: 10px;
-    }
+.sidebar {
+  width: 220px;
+  background: rgba(0,15,30,.85);
+  border-right: 1px solid #0ff;
+  padding: 10px;
+}
 
-    textarea {
-      height: 220px;
-      background: #020b13;
-      color: #00ffcc;
-      border: 1px solid #00ffff;
-      padding: 8px;
-      resize: none;
-    }
+.sidebar button {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 10px;
+  background: #000;
+  border: 1px solid #0ff;
+  color: #0ff;
+  cursor: pointer;
+}
 
-    /* PREVIEW */
-    iframe {
-      width: 98%;
-      height: 420px;
-      border: 2px solid #00ffff;
-      background: white;
-      margin-bottom: 10px;
-    }
+.sidebar button:hover {
+  background: rgba(0,255,255,.15);
+}
 
-    pre {
-      width: 98%;
-      margin: auto;
-      background: #010a12;
-      color: #00ff88;
-      padding: 10px;
-      min-height: 140px;
-    }
+.main {
+  flex: 1;
+  padding: 16px;
+  overflow: auto;
+}
 
-    /* CHAT */
-    .chat {
-      width: 98%;
-      margin: 15px auto;
-      border: 1px solid #00ffff;
-      padding: 10px;
-      background: #010a12;
-      text-align: left;
-    }
+/* ===== EDITOR ===== */
+textarea {
+  width: 100%;
+  height: 180px;
+  background: #000;
+  color: #0ff;
+  border: 1px solid #0ff;
+  padding: 10px;
+  font-family: monospace;
+  font-size: 14px;
+}
 
-    #messages {
-      height: 160px;
-      overflow-y: auto;
-      border: 1px solid #00ffff;
-      padding: 6px;
-      margin-bottom: 6px;
-    }
+.run-btn {
+  margin-top: 10px;
+  padding: 10px 16px;
+  font-size: 14px;
+  background: #000;
+  border: 1px solid #0ff;
+  color: #0ff;
+  cursor: pointer;
+}
 
-    .users-box {
-      border: 1px solid #00ffff;
-      padding: 6px;
-      background: #000814;
-      font-size: 12px;
-      margin-bottom: 6px;
-    }
+.run-btn:hover {
+  background: rgba(0,255,255,.2);
+}
 
-    #users {
-      color: #00ffcc;
-      margin-top: 4px;
-    }
+/* ===== OUTPUT ===== */
+.output {
+  margin-top: 14px;
+  background: #000;
+  border: 1px solid #0ff;
+  padding: 10px;
+  height: 160px;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 13px;
+}
 
-    .chat input, .chat button {
-      width: 100%;
-      margin-top: 5px;
-      background: black;
-      color: #00ffff;
-      border: 1px solid #00ffff;
-      padding: 6px;
-    }
-  </style>
+/* ===== LEARN PAGE ===== */
+.command {
+  border: 1px solid #0ff;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: rgba(0,0,0,.7);
+}
+
+.command b {
+  color: #7ffcff;
+}
+</style>
 </head>
 
 <body>
 
-<canvas id="stars"></canvas>
-
-<header>
-  <h1>⚡ Sci-Fi Code Lab ⚡</h1>
-  <div class="controls">
-    <input id="room" placeholder="Room ID">
-    <button onclick="joinRoom()">👥 Join</button>
-    <button onclick="runCode()">🚀 Run</button>
-    <button onclick="saveLocal()">💾 Save</button>
-    <button onclick="loadLocal()">📂 Load</button>
-    <button onclick="toggleFullscreen()">🖥 Full</button>
-  </div>
-</header>
-
-<!-- EDITORS -->
-<div class="editor-container" id="editor">
-  <textarea id="htmlCode" placeholder="HTML"></textarea>
-  <textarea id="cssCode" placeholder="CSS"></textarea>
-  <textarea id="jsCode" placeholder="JavaScript"></textarea>
+<div class="top">
+  <h1>🌌 Galaxia Browser — GalaCode Engine</h1>
 </div>
 
-<!-- PREVIEW -->
-<h2>🧪 Output</h2>
-<iframe id="output"></iframe>
-
-<h2>🖥 Console</h2>
-<pre id="console"></pre>
-
-<!-- CHAT UNDER PREVIEW -->
-<div class="chat">
-  <h3>💬 Galactic Chat</h3>
-
-  <div id="messages"></div>
-
-  <div class="users-box">
-    <strong>🧑‍🚀 Active Users</strong>
-    <div id="users"></div>
+<div class="app">
+  <div class="sidebar">
+    <button onclick="openPage('editor')">🧠 GalaCode Editor</button>
+    <button onclick="openPage('learn')">📘 Learn GalaCode</button>
+    <button onclick="openPage('about')">ℹ About</button>
   </div>
 
-  <input id="username" placeholder="Name">
-  <input id="chatInput" placeholder="Message">
-  <button onclick="sendMessage()">Send</button>
+  <div class="main">
+
+    <!-- EDITOR -->
+    <div id="editor">
+      <h2>GalaCode Editor</h2>
+      <p>Type GalaCode commands below:</p>
+
+<textarea id="code">
+ui.glow on
+system.time
+effect.flash
+dev.echo Hello Galaxia
+</textarea>
+
+      <button class="run-btn" onclick="runGalaCode()">▶ Run GalaCode</button>
+
+      <div class="output" id="output"></div>
+    </div>
+
+    <!-- LEARN -->
+    <div id="learn" class="hidden">
+      <h2>Learn GalaCode</h2>
+
+      <div class="command">
+        <b>ui.glow on</b><br>
+        Enables neon glow UI
+      </div>
+
+      <div class="command">
+        <b>ui.glow off</b><br>
+        Disables glow UI
+      </div>
+
+      <div class="command">
+        <b>system.time</b><br>
+        Shows current system time
+      </div>
+
+      <div class="command">
+        <b>system.clear</b><br>
+        Clears output console
+      </div>
+
+      <div class="command">
+        <b>effect.flash</b><br>
+        Screen flash effect
+      </div>
+
+      <div class="command">
+        <b>effect.shake</b><br>
+        Screen shake animation
+      </div>
+
+      <div class="command">
+        <b>dev.echo [text]</b><br>
+        Prints text to output
+      </div>
+
+      <p>More commands can be added easily (50–75 total planned).</p>
+    </div>
+
+    <!-- ABOUT -->
+    <div id="about" class="hidden">
+      <h2>About</h2>
+      <p>
+        Galaxia Browser is a custom sci-fi browser environment with its own
+        language called <b>GalaCode</b>.
+      </p>
+      <p>
+        GalaCode is safe, local, and sandboxed — no eval, no exploits.
+      </p>
+      <p>
+        Built to be fast, private, and impossible to mess with.
+      </p>
+    </div>
+
+  </div>
 </div>
 
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+/* ===== PAGE SWITCHING ===== */
+function openPage(id) {
+  ["editor","learn","about"].forEach(p => {
+    document.getElementById(p).classList.add("hidden");
+  });
+  document.getElementById(id).classList.remove("hidden");
+}
 
-<script src="script.js"></script>
+/* ===== OUTPUT ===== */
+const output = document.getElementById("output");
+function log(msg) {
+  output.innerHTML += msg + "<br>";
+  output.scrollTop = output.scrollHeight;
+}
+
+/* ===== GALACODE ENGINE ===== */
+const commands = {
+
+  "ui.glow on": () => {
+    document.body.classList.add("glow");
+    log("Glow enabled");
+  },
+
+  "ui.glow off": () => {
+    document.body.classList.remove("glow");
+    log("Glow disabled");
+  },
+
+  "system.time": () => {
+    log("Time: " + new Date().toLocaleTimeString());
+  },
+
+  "system.clear": () => {
+    output.innerHTML = "";
+  },
+
+  "effect.flash": () => {
+    document.body.style.background = "#0ff";
+    setTimeout(() => {
+      document.body.style.background = "";
+    }, 120);
+    log("Flash effect");
+  },
+
+  "effect.shake": () => {
+    document.body.style.transform = "translateX(10px)";
+    setTimeout(() => document.body.style.transform = "", 120);
+    log("Shake effect");
+  },
+
+  "dev.echo": (args) => {
+    log(args.join(" "));
+  }
+};
+
+/* ===== RUNNER ===== */
+function runGalaCode() {
+  const code = document.getElementById("code").value;
+  const lines = code.split("\n");
+
+  lines.forEach(line => {
+    const clean = line.trim();
+    if (!clean) return;
+
+    const parts = clean.split(" ");
+    const key2 = parts.slice(0,2).join(" ");
+    const key1 = parts[0];
+    const args = parts.slice(1);
+
+    if (commands[clean]) {
+      commands[clean]();
+    } else if (commands[key2]) {
+      commands[key2](parts.slice(2));
+    } else if (commands[key1]) {
+      commands[key1](args);
+    } else {
+      log("Unknown command: " + clean);
+    }
+  });
+}
+</script>
+
 </body>
 </html>
