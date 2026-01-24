@@ -1,299 +1,122 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Galaxia Browser • GalaCode</title>
-
-<style>
-html, body {
-  margin: 0;
-  height: 100%;
-  background: radial-gradient(circle at top, #00131f, #000);
-  font-family: Orbitron, system-ui, sans-serif;
-  color: #0ff;
-  overflow: hidden;
-}
-
-/* ===== GLOBAL EFFECTS ===== */
-.glow * {
-  text-shadow: 0 0 8px #0ff;
-}
-.hidden { display: none; }
-
-/* ===== TOP BAR ===== */
-.top {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  background: rgba(0,20,35,.9);
-  border-bottom: 1px solid #0ff;
-}
-
-.top h1 {
-  font-size: 18px;
-  margin: 0;
-  flex: 1;
-}
-
-/* ===== LAYOUT ===== */
-.app {
-  display: flex;
-  height: calc(100% - 52px);
-}
-
-.sidebar {
-  width: 220px;
-  background: rgba(0,15,30,.85);
-  border-right: 1px solid #0ff;
-  padding: 10px;
-}
-
-.sidebar button {
-  width: 100%;
-  margin-bottom: 8px;
-  padding: 10px;
-  background: #000;
-  border: 1px solid #0ff;
-  color: #0ff;
-  cursor: pointer;
-}
-
-.sidebar button:hover {
-  background: rgba(0,255,255,.15);
-}
-
-.main {
-  flex: 1;
-  padding: 16px;
-  overflow: auto;
-}
-
-/* ===== EDITOR ===== */
-textarea {
-  width: 100%;
-  height: 180px;
-  background: #000;
-  color: #0ff;
-  border: 1px solid #0ff;
-  padding: 10px;
-  font-family: monospace;
-  font-size: 14px;
-}
-
-.run-btn {
-  margin-top: 10px;
-  padding: 10px 16px;
-  font-size: 14px;
-  background: #000;
-  border: 1px solid #0ff;
-  color: #0ff;
-  cursor: pointer;
-}
-
-.run-btn:hover {
-  background: rgba(0,255,255,.2);
-}
-
-/* ===== OUTPUT ===== */
-.output {
-  margin-top: 14px;
-  background: #000;
-  border: 1px solid #0ff;
-  padding: 10px;
-  height: 160px;
-  overflow-y: auto;
-  font-family: monospace;
-  font-size: 13px;
-}
-
-/* ===== LEARN PAGE ===== */
-.command {
-  border: 1px solid #0ff;
-  padding: 10px;
-  margin-bottom: 10px;
-  background: rgba(0,0,0,.7);
-}
-
-.command b {
-  color: #7ffcff;
-}
-</style>
-</head>
-
-<body>
-
-<div class="top">
-  <h1>🌌 Galaxia Browser — GalaCode Engine</h1>
-</div>
-
-<div class="app">
-  <div class="sidebar">
-    <button onclick="openPage('editor')">🧠 GalaCode Editor</button>
-    <button onclick="openPage('learn')">📘 Learn GalaCode</button>
-    <button onclick="openPage('about')">ℹ About</button>
-  </div>
-
-  <div class="main">
-
-    <!-- EDITOR -->
-    <div id="editor">
-      <h2>GalaCode Editor</h2>
-      <p>Type GalaCode commands below:</p>
-
-<textarea id="code">
+system.clear
+system.boot
 ui.glow on
-system.time
+ui.theme neon
+ui.background stars
+
+dev.echo =====================================
+dev.echo      GALAXIA CORE INTERFACE
+dev.echo =====================================
+
 effect.flash
-dev.echo Hello Galaxia
-</textarea>
+effect.glitch soft
+system.time
 
-      <button class="run-btn" onclick="runGalaCode()">▶ Run GalaCode</button>
+dev.echo Initializing subsystems...
+system.wait 500
 
-      <div class="output" id="output"></div>
-    </div>
+dev.echo [✓] Memory Allocated
+dev.echo [✓] Encryption Loaded
+dev.echo [✓] Firewall Active
+dev.echo [✓] Sandbox Enabled
+system.wait 300
 
-    <!-- LEARN -->
-    <div id="learn" class="hidden">
-      <h2>Learn GalaCode</h2>
+effect.shake light
+dev.echo Security Scan Running...
+system.wait 700
+dev.echo No threats detected.
 
-      <div class="command">
-        <b>ui.glow on</b><br>
-        Enables neon glow UI
-      </div>
+dev.echo -------------------------------------
+dev.echo USER SESSION
+dev.echo -------------------------------------
 
-      <div class="command">
-        <b>ui.glow off</b><br>
-        Disables glow UI
-      </div>
+user.name
+user.id
+user.level
 
-      <div class="command">
-        <b>system.time</b><br>
-        Shows current system time
-      </div>
+dev.echo Access Level: PRIVATE
+dev.echo Mode: ISOLATED
+dev.echo Tracking: DISABLED
 
-      <div class="command">
-        <b>system.clear</b><br>
-        Clears output console
-      </div>
+dev.echo -------------------------------------
+dev.echo NETWORK STATUS
+dev.echo -------------------------------------
 
-      <div class="command">
-        <b>effect.flash</b><br>
-        Screen flash effect
-      </div>
+net.status
+net.ping
+net.region
 
-      <div class="command">
-        <b>effect.shake</b><br>
-        Screen shake animation
-      </div>
+dev.echo Multiplayer: ENABLED
+dev.echo Rooms: PRIVATE ONLY
+dev.echo Visibility: HIDDEN
 
-      <div class="command">
-        <b>dev.echo [text]</b><br>
-        Prints text to output
-      </div>
+dev.echo -------------------------------------
+dev.echo UI CONTROLS
+dev.echo -------------------------------------
 
-      <p>More commands can be added easily (50–75 total planned).</p>
-    </div>
+ui.button Open_Learning_Page -> page.learn
+ui.button View_Commands -> page.commands
+ui.button System_Status -> page.status
+ui.button Shutdown -> system.shutdown
 
-    <!-- ABOUT -->
-    <div id="about" class="hidden">
-      <h2>About</h2>
-      <p>
-        Galaxia Browser is a custom sci-fi browser environment with its own
-        language called <b>GalaCode</b>.
-      </p>
-      <p>
-        GalaCode is safe, local, and sandboxed — no eval, no exploits.
-      </p>
-      <p>
-        Built to be fast, private, and impossible to mess with.
-      </p>
-    </div>
+dev.echo -------------------------------------
+dev.echo LIVE EFFECTS
+dev.echo -------------------------------------
 
-  </div>
-</div>
+effect.matrix start
+system.wait 600
+effect.matrix stop
 
-<script>
-/* ===== PAGE SWITCHING ===== */
-function openPage(id) {
-  ["editor","learn","about"].forEach(p => {
-    document.getElementById(p).classList.add("hidden");
-  });
-  document.getElementById(id).classList.remove("hidden");
-}
+effect.scanlines on
+effect.pulse slow
 
-/* ===== OUTPUT ===== */
-const output = document.getElementById("output");
-function log(msg) {
-  output.innerHTML += msg + "<br>";
-  output.scrollTop = output.scrollHeight;
-}
+dev.echo -------------------------------------
+dev.echo GALACODE SCRIPTING DEMO
+dev.echo -------------------------------------
 
-/* ===== GALACODE ENGINE ===== */
-const commands = {
+dev.echo Example:
+dev.echo dev.echo Hello World
+dev.echo ui.glow on
+dev.echo effect.flash
 
-  "ui.glow on": () => {
-    document.body.classList.add("glow");
-    log("Glow enabled");
-  },
+dev.echo -------------------------------------
+dev.echo AUTOMATION TEST
+dev.echo -------------------------------------
 
-  "ui.glow off": () => {
-    document.body.classList.remove("glow");
-    log("Glow disabled");
-  },
+if system.secure == true
+  dev.echo System Secure ✔
+else
+  dev.echo Warning: Security Risk ✖
+end
 
-  "system.time": () => {
-    log("Time: " + new Date().toLocaleTimeString());
-  },
+dev.echo -------------------------------------
+dev.echo TUTORIAL HINTS
+dev.echo -------------------------------------
 
-  "system.clear": () => {
-    output.innerHTML = "";
-  },
+tip.show Use "system.clear" to reset the screen
+tip.show Use "ui.glow on" for neon effects
+tip.show Use "effect.glitch" for sci-fi vibes
+tip.show Use "page.goto name" to navigate
 
-  "effect.flash": () => {
-    document.body.style.background = "#0ff";
-    setTimeout(() => {
-      document.body.style.background = "";
-    }, 120);
-    log("Flash effect");
-  },
+dev.echo -------------------------------------
+dev.echo ADVANCED FEATURES
+dev.echo -------------------------------------
 
-  "effect.shake": () => {
-    document.body.style.transform = "translateX(10px)";
-    setTimeout(() => document.body.style.transform = "", 120);
-    log("Shake effect");
-  },
+sandbox.enable
+sandbox.lock
 
-  "dev.echo": (args) => {
-    log(args.join(" "));
-  }
-};
+dev.echo Code Isolation: ACTIVE
+dev.echo External Access: BLOCKED
+dev.echo Script Scope: LOCAL
 
-/* ===== RUNNER ===== */
-function runGalaCode() {
-  const code = document.getElementById("code").value;
-  const lines = code.split("\n");
+dev.echo -------------------------------------
+dev.echo FINAL MESSAGE
+dev.echo -------------------------------------
 
-  lines.forEach(line => {
-    const clean = line.trim();
-    if (!clean) return;
+effect.flash
+dev.echo Welcome to Galaxia.
+dev.echo This system is private.
+dev.echo This system is secure.
+dev.echo This system is yours.
 
-    const parts = clean.split(" ");
-    const key2 = parts.slice(0,2).join(" ");
-    const key1 = parts[0];
-    const args = parts.slice(1);
-
-    if (commands[clean]) {
-      commands[clean]();
-    } else if (commands[key2]) {
-      commands[key2](parts.slice(2));
-    } else if (commands[key1]) {
-      commands[key1](args);
-    } else {
-      log("Unknown command: " + clean);
-    }
-  });
-}
-</script>
-
-</body>
-</html>
+ui.footer © Galaxia Platform
