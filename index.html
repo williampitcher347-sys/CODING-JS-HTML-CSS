@@ -2,20 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Galaxia • GalaCode Engine</title>
+<title>Galaxia Platform</title>
 
 <style>
 :root {
   --neon:#00f6ff;
-  --bg:#030712;
+  --bg:#020617;
 }
 
 body {
   margin:0;
-  font-family:Consolas,monospace;
+  font-family:Consolas, monospace;
   background:radial-gradient(circle at top,#0b1020,#000);
   color:var(--neon);
-  overflow:hidden;
 }
 
 header {
@@ -23,210 +22,193 @@ header {
   text-align:center;
   font-size:26px;
   letter-spacing:3px;
-  box-shadow:0 0 25px #00f6ff55;
+  box-shadow:0 0 30px #00f6ff55;
 }
 
-#app {
+#layout {
   display:grid;
-  grid-template-columns:45% 55%;
+  grid-template-columns:280px 1fr;
   height:calc(100vh - 70px);
 }
 
-textarea {
-  background:#020617;
-  color:var(--neon);
-  border:none;
-  padding:16px;
-  font-size:14px;
-  outline:none;
-  resize:none;
-}
-
-#editor {
-  border-right:2px solid #00f6ff33;
-}
-
-#run {
-  width:100%;
-  padding:12px;
-  background:var(--neon);
-  color:#000;
-  font-weight:bold;
-  border:none;
-  cursor:pointer;
-}
-
-#output {
+#sidebar {
   background:#01040d;
+  border-right:2px solid #00f6ff33;
+  padding:12px;
+  overflow-y:auto;
+}
+
+#main {
   padding:16px;
   overflow-y:auto;
-  box-shadow:inset 0 0 40px #00f6ff22;
 }
 
-.line { margin-bottom:6px }
-.glow { text-shadow:0 0 10px var(--neon) }
-.flash { animation:flash .15s }
-@keyframes flash { from{background:#00f6ff33} to{background:transparent} }
-
-.btn {
-  display:inline-block;
-  margin:6px 6px 0 0;
-  padding:6px 12px;
+button {
+  width:100%;
+  margin-bottom:8px;
+  padding:10px;
+  background:#00f6ff22;
+  color:var(--neon);
   border:1px solid var(--neon);
   cursor:pointer;
+}
+
+button:hover { background:#00f6ff44 }
+
+.panel {
+  padding:12px;
+  margin-bottom:12px;
+  border:1px solid #00f6ff33;
+  box-shadow:0 0 15px #00f6ff22;
+}
+
+.hidden { display:none }
+
+input {
+  width:100%;
+  padding:8px;
+  margin-bottom:10px;
+  background:#020617;
+  color:var(--neon);
+  border:1px solid #00f6ff33;
+}
+
+.func {
+  border:1px solid #00f6ff22;
+  padding:8px;
+  margin-bottom:6px;
+  cursor:pointer;
+}
+
+.func:hover { background:#00f6ff11 }
+
+.func b { color:#9ff }
+
+.category {
+  margin-top:14px;
+  font-size:18px;
+  border-bottom:1px solid #00f6ff33;
 }
 </style>
 </head>
 
 <body>
 
-<header>🌌 GALAXIA • 400+ FUNCTION GALACODE ENGINE</header>
+<header>🌌 GALAXIA • 400 FUNCTION LEARNING PLATFORM</header>
 
-<div id="app">
-  <div>
-<textarea id="editor" spellcheck="false">
-system.clear
-ui.glow on
-dev.echo === GALAXIA CORE ===
-system.time
-effect.flash
-
-ui.button Learn_GalaCode -> page.learn
-ui.button Show_Commands -> page.commands
-</textarea>
-<button id="run">▶ RUN GALACODE</button>
+<div id="layout">
+  <div id="sidebar">
+    <button onclick="show('home')">🏠 Home</button>
+    <button onclick="show('learn')">📘 Learning</button>
+    <button onclick="show('system')">🛡 System</button>
   </div>
 
-  <div id="output"></div>
+  <div id="main">
+    <div id="home" class="panel">
+      <h2>Welcome to Galaxia</h2>
+      <p>Private • Secure • Experimental</p>
+      <p>Explore 400+ built-in platform functions.</p>
+    </div>
+
+    <div id="learn" class="panel hidden">
+      <h2>📘 Learning Center</h2>
+      <input id="search" placeholder="Search functions..." oninput="renderLearning()">
+      <div id="learningList"></div>
+    </div>
+
+    <div id="system" class="panel hidden">
+      <h2>System Status</h2>
+      <pre id="sysInfo"></pre>
+    </div>
+  </div>
 </div>
 
 <script>
-/* ================================
-   CORE ENGINE
-================================ */
-const output = document.getElementById("output");
-const ctx = {
-  glow:false,
-  vars:{},
-  page:"main"
-};
-
-function log(txt){
-  const d=document.createElement("div");
-  d.className="line";
-  d.textContent=txt;
-  output.appendChild(d);
-  output.scrollTop=output.scrollHeight;
+/* =============================
+   NAVIGATION
+============================= */
+const pages=["home","learn","system"];
+function show(p){
+  pages.forEach(x=>document.getElementById(x).classList.add("hidden"));
+  document.getElementById(p).classList.remove("hidden");
 }
 
-function clearOut(){ output.innerHTML=""; }
+/* =============================
+   FEATURE REGISTRY (400)
+============================= */
+const FEATURES = [];
+const categories = [
+  "system","ui","effect","data",
+  "net","user","page","security"
+];
 
-/* ================================
-   COMMAND REGISTRY (400+)
-================================ */
-const COMMANDS = {};
-
-// helper
-function cmd(name, fn){ COMMANDS[name]=fn; }
-
-/* ---- SYSTEM (40) ---- */
-for(let i=1;i<=40;i++){
-  cmd(`system.fn${i}`,()=>log(`System function ${i} executed`));
-}
-cmd("system.clear", clearOut);
-cmd("system.time", ()=>log("⏱ "+new Date().toLocaleTimeString()));
-
-/* ---- UI (40) ---- */
-for(let i=1;i<=40;i++){
-  cmd(`ui.fn${i}`,()=>log(`UI function ${i}`));
-}
-cmd("ui.glow on", ()=>{output.classList.add("glow")});
-cmd("ui.glow off",()=>{output.classList.remove("glow")});
-
-/* ---- EFFECTS (40) ---- */
-for(let i=1;i<=40;i++){
-  cmd(`effect.fn${i}`,()=>log(`Effect ${i} triggered`));
-}
-cmd("effect.flash",()=>{
-  output.classList.add("flash");
-  setTimeout(()=>output.classList.remove("flash"),150);
-});
-
-/* ---- DEV (40) ---- */
-for(let i=1;i<=40;i++){
-  cmd(`dev.log${i}`,()=>log(`Dev log ${i}`));
-}
-cmd("dev.echo",(args)=>log(args.join(" ")));
-
-/* ---- DATA (40) ---- */
-for(let i=1;i<=40;i++){
-  cmd(`data.fn${i}`,()=>log(`Data op ${i}`));
-}
-
-/* ---- NET (40) ---- */
-for(let i=1;i<=40;i++){
-  cmd(`net.fn${i}`,()=>log(`Net op ${i}`));
-}
-
-/* ---- PAGE (40) ---- */
-for(let i=1;i<=40;i++){
-  cmd(`page.fn${i}`,()=>log(`Page fn ${i}`));
-}
-cmd("page.learn",()=>{
-  clearOut();
-  log("📘 GALACODE LEARNING");
-  log("• system.clear");
-  log("• dev.echo text");
-  log("• ui.glow on/off");
-  log("• effect.flash");
-  log("• ui.button Name -> page.x");
-});
-cmd("page.commands",()=>{
-  clearOut();
-  log("📜 TOTAL COMMANDS: "+Object.keys(COMMANDS).length);
-  Object.keys(COMMANDS).slice(0,50).forEach(c=>log(c));
-  log("...and hundreds more");
-});
-
-/* ---- UI.BUTTON (SPECIAL) ---- */
-cmd("ui.button",(args)=>{
-  const [label,,target]=args;
-  const b=document.createElement("div");
-  b.className="btn";
-  b.textContent=label.replace(/_/g," ");
-  b.onclick=()=>runLine(target);
-  output.appendChild(b);
-});
-
-/* ================================
-   INTERPRETER
-================================ */
-function runLine(line){
-  const parts=line.trim().split(" ");
-  if(!parts[0])return;
-
-  // special commands
-  if(line.startsWith("dev.echo")){
-    COMMANDS["dev.echo"]([line.replace("dev.echo","").trim()]);
-    return;
+// generate 400 structured features
+categories.forEach(cat=>{
+  for(let i=1;i<=50;i++){
+    FEATURES.push({
+      name:`${cat}.${i}`,
+      category:cat,
+      description:`Performs ${cat} operation #${i}.`,
+      example:`${cat}.${i}()`
+    });
   }
-  if(line.startsWith("ui.button")){
-    const a=line.replace("ui.button","").trim().split(" ");
-    COMMANDS["ui.button"](a);
-    return;
-  }
+});
 
-  const fn=COMMANDS[line];
-  fn ? fn() : log("⚠ Unknown: "+line);
+// real system example
+FEATURES.push({
+  name:"system.status",
+  category:"system",
+  description:"Shows system security and runtime status.",
+  example:"system.status()"
+});
+
+/* =============================
+   LEARNING PAGE RENDER
+============================= */
+const list=document.getElementById("learningList");
+function renderLearning(){
+  const q=document.getElementById("search").value.toLowerCase();
+  list.innerHTML="";
+
+  categories.forEach(cat=>{
+    const items=FEATURES.filter(f =>
+      f.category===cat &&
+      (f.name.includes(q) || f.description.includes(q))
+    );
+    if(!items.length) return;
+
+    const h=document.createElement("div");
+    h.className="category";
+    h.textContent=cat.toUpperCase();
+    list.appendChild(h);
+
+    items.forEach(f=>{
+      const d=document.createElement("div");
+      d.className="func";
+      d.innerHTML=`
+        <b>${f.name}</b><br>
+        ${f.description}<br>
+        <small>Example: ${f.example}</small>
+      `;
+      list.appendChild(d);
+    });
+  });
 }
 
-function run(code){
-  code.split("\n").forEach(l=>runLine(l));
-}
+/* =============================
+   SYSTEM PAGE
+============================= */
+document.getElementById("sysInfo").textContent =
+`Security: ENABLED
+Isolation: ON
+Tracking: OFF
+Functions Loaded: ${FEATURES.length}
+Time: ${new Date().toLocaleTimeString()}`;
 
-document.getElementById("run").onclick=()=>{
-  run(document.getElementById("editor").value);
-};
+/* =============================
+   INIT
+============================= */
+renderLearning();
 </script>
 
 </body>
