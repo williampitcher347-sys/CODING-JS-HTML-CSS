@@ -2,157 +2,164 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Galaxia Learn</title>
+<title>Galaxia Code Studio</title>
 
 <style>
 body{
   margin:0;
-  background:#020617;
+  background:#050a1a;
   color:#00f6ff;
   font-family:system-ui;
 }
 header{
-  padding:20px;
+  padding:18px;
   text-align:center;
   font-size:28px;
   letter-spacing:3px;
   box-shadow:0 0 40px #00f6ff55;
 }
-#app{
+#layout{
   display:grid;
-  grid-template-columns:320px 1fr;
+  grid-template-columns:1fr 1fr;
   height:calc(100vh - 80px);
 }
-#left{
-  border-right:2px solid #00f6ff22;
-  padding:12px;
-  overflow:auto;
-}
-#right{
-  padding:16px;
+#editors{
   display:grid;
-  grid-template-rows:auto 1fr auto;
+  grid-template-rows:1fr 1fr;
 }
-input,textarea{
+.editor{
+  padding:10px;
+  border-bottom:1px solid #00f6ff22;
+}
+.editor h3{margin:4px 0}
+textarea{
   width:100%;
+  height:100%;
   background:#000;
   color:#00f6ff;
   border:1px solid #00f6ff44;
   padding:10px;
+  box-sizing:border-box;
+  font-family:monospace;
 }
-textarea{height:160px}
+#controls{
+  padding:10px;
+  border-top:1px solid #00f6ff22;
+}
 button{
   background:#00f6ff22;
   border:1px solid #00f6ff;
   color:#00f6ff;
-  padding:10px;
+  padding:12px 24px;
   cursor:pointer;
+  font-size:16px;
 }
-.command{
-  border:1px solid #00f6ff33;
-  margin-bottom:10px;
-  padding:10px;
-}
-.command h3{margin:0}
-#console{
+button:hover{background:#00f6ff55}
+#preview{
   background:#000;
-  padding:10px;
-  height:160px;
-  overflow:auto;
-  font-family:monospace;
+  border-left:2px solid #00f6ff33;
+}
+iframe{
+  width:100%;
+  height:100%;
+  border:none;
+  background:white;
 }
 </style>
 </head>
 
 <body>
 
-<header>🌌 GALAXIA LEARNING CORE</header>
+<header>🌌 GALAXIA CODE STUDIO</header>
 
-<div id="app">
+<div id="layout">
 
-<div id="left">
-<input placeholder="Search commands..." oninput="search(this.value)">
-<div id="list"></div>
+<div id="editors">
+
+<div class="editor">
+<h3>1️⃣ HTML</h3>
+<textarea id="htmlCode"><h1>Hello Galaxia</h1>
+<p id="msg">Waiting...</p></textarea>
 </div>
 
-<div id="right">
-<div>
-<h3>🧪 Script Editor</h3>
-<textarea id="editor">
-Say("Hello")
-Wait(1)
-CreateRoom("Test")
+<div class="editor">
+<h3>2️⃣ CSS</h3>
+<textarea id="cssCode">body{font-family:Arial;text-align:center}
+h1{color:purple}</textarea>
+</div>
+
+<div class="editor">
+<h3>3️⃣ JavaScript</h3>
+<textarea id="jsCode">document.getElementById("msg").innerText="JS Loaded";</textarea>
+</div>
+
+<div class="editor">
+<h3>4️⃣ GalaScript</h3>
+<textarea id="galaCode">
+Say("Welcome to Galaxia")
+SetText("#msg","From GalaScript")
+SetColor("h1","blue")
 </textarea>
-<button onclick="run()">▶ Run</button>
 </div>
 
-<div></div>
+<div id="controls">
+<button onclick="runAll()">▶ RUN ALL</button>
+</div>
 
-<div id="console"></div>
+</div>
+
+<div id="preview">
+<iframe id="frame"></iframe>
 </div>
 
 </div>
 
 <script>
-const COMMANDS=[
-  {name:"Loop",args:"(times)",desc:"Repeat actions"},
-  {name:"If",args:"(condition)",desc:"Conditional execution"},
-  {name:"Stop",args:"()",desc:"Stops script"},
-  {name:"Wait",args:"(seconds)",desc:"Pause execution"},
-  {name:"Delay",args:"(ms)",desc:"Delay action"},
-  {name:"Say",args:"(text)",desc:"Send chat message"},
-  {name:"Broadcast",args:"(text)",desc:"Send message to everyone"},
-  {name:"ClearChat",args:"()",desc:"Clear chat history"},
-  {name:"CreateRoom",args:"(name)",desc:"Create a room"},
-  {name:"JoinRoom",args:"(name)",desc:"Join a room"},
-  {name:"LeaveRoom",args:"()",desc:"Leave room"},
-  {name:"ListRooms",args:"()",desc:"Show rooms"},
-  {name:"SetName",args:"(name)",desc:"Set username"},
-  {name:"GetUserID",args:"()",desc:"Return user ID"},
-  {name:"IsAdmin",args:"()",desc:"Check admin"},
-  {name:"KickUser",args:"(id)",desc:"Kick a user"},
-  {name:"BanUser",args:"(id)",desc:"Ban user"},
-  {name:"SetTheme",args:"(theme)",desc:"Change UI theme"},
-  {name:"SetColor",args:"(color)",desc:"Change color"},
-  {name:"Save",args:"(key,value)",desc:"Save data"},
-  {name:"Load",args:"(key)",desc:"Load data"},
-  {name:"Delete",args:"(key)",desc:"Delete data"},
-  {name:"PlaySound",args:"(name)",desc:"Play sound"},
-  {name:"Mute",args:"()",desc:"Mute sound"}
-];
-
-const list=document.getElementById("list");
-function render(arr){
-  list.innerHTML="";
-  arr.forEach(c=>{
-    const d=document.createElement("div");
-    d.className="command";
-    d.innerHTML=`<h3>${c.name}${c.args}</h3><small>${c.desc}</small>`;
-    d.onclick=()=>insert(c.name);
-    list.appendChild(d);
+function parseGala(script){
+  let js="";
+  script.split("\n").forEach(line=>{
+    line=line.trim();
+    if(line.startsWith("Say")){
+      const t=line.match(/"(.*)"/)?.[1];
+      js+=`console.log(${JSON.stringify(t)});\n`;
+    }
+    if(line.startsWith("SetText")){
+      const p=line.match(/"(.*?)"/g);
+      if(p) js+=`document.querySelector(${p[0]}).innerText=${p[1]};\n`;
+    }
+    if(line.startsWith("SetColor")){
+      const p=line.match(/"(.*?)"/g);
+      if(p) js+=`document.querySelector(${p[0]}).style.color=${p[1]};\n`;
+    }
   });
+  return js;
 }
-function search(q){
-  q=q.toLowerCase();
-  render(COMMANDS.filter(c=>c.name.toLowerCase().includes(q)));
-}
-function insert(name){
-  editor.value+=`\n${name}()`;
-}
-render(COMMANDS);
 
-const consoleBox=document.getElementById("console");
-function log(t){
-  consoleBox.innerHTML+=t+"<br>";
-  consoleBox.scrollTop=consoleBox.scrollHeight;
-}
-function run(){
-  consoleBox.innerHTML="";
-  editor.value.split("\n").forEach(line=>{
-    const cmd=line.split("(")[0].trim();
-    if(!cmd) return;
-    log("▶ "+cmd+" executed");
-  });
+function runAll(){
+  const html=document.getElementById("htmlCode").value;
+  const css=document.getElementById("cssCode").value;
+  const js=document.getElementById("jsCode").value;
+  const gala=document.getElementById("galaCode").value;
+
+  const galaJS=parseGala(gala);
+
+  const doc=`
+<!DOCTYPE html>
+<html>
+<head>
+<style>${css}</style>
+</head>
+<body>
+${html}
+<script>
+${js}
+${galaJS}
+<\/script>
+</body>
+</html>`;
+
+  const iframe=document.getElementById("frame");
+  iframe.srcdoc=doc;
 }
 </script>
 
