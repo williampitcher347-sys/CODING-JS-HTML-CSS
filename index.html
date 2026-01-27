@@ -1,165 +1,197 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Galaxia Code Studio</title>
 
 <style>
-body{
-  margin:0;
-  background:#050a1a;
-  color:#00f6ff;
-  font-family:system-ui;
+body {
+  margin: 0;
+  background: #050814;
+  color: #00f6ff;
+  font-family: system-ui, sans-serif;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
-header{
-  padding:18px;
-  text-align:center;
-  font-size:28px;
-  letter-spacing:3px;
-  box-shadow:0 0 40px #00f6ff55;
+
+header {
+  padding: 14px;
+  text-align: center;
+  font-size: 22px;
+  box-shadow: 0 0 30px #00f6ff55;
 }
-#layout{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  height:calc(100vh - 80px);
+
+.controls {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  justify-content: center;
 }
-#editors{
-  display:grid;
-  grid-template-rows:1fr 1fr;
+
+.controls input {
+  padding: 8px;
+  width: 160px;
+  background: #000;
+  border: 1px solid #00f6ff;
+  color: #00f6ff;
 }
-.editor{
-  padding:10px;
-  border-bottom:1px solid #00f6ff22;
+
+button {
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid #00f6ff;
+  color: #00f6ff;
+  cursor: pointer;
 }
-.editor h3{margin:4px 0}
-textarea{
-  width:100%;
-  height:100%;
-  background:#000;
-  color:#00f6ff;
-  border:1px solid #00f6ff44;
-  padding:10px;
-  box-sizing:border-box;
-  font-family:monospace;
+
+button:hover {
+  background: #00f6ff;
+  color: #000;
 }
-#controls{
-  padding:10px;
-  border-top:1px solid #00f6ff22;
+
+.workspace {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  flex: 1;
 }
-button{
-  background:#00f6ff22;
-  border:1px solid #00f6ff;
-  color:#00f6ff;
-  padding:12px 24px;
-  cursor:pointer;
-  font-size:16px;
+
+.editors {
+  display: grid;
+  grid-template-rows: 1fr 1fr 1fr;
+  border-right: 1px solid #00f6ff33;
 }
-button:hover{background:#00f6ff55}
-#preview{
-  background:#000;
-  border-left:2px solid #00f6ff33;
+
+.editor {
+  display: flex;
+  flex-direction: column;
 }
-iframe{
-  width:100%;
-  height:100%;
-  border:none;
-  background:white;
+
+.editor label {
+  background: #000;
+  padding: 6px;
+  font-size: 13px;
+}
+
+textarea {
+  flex: 1;
+  background: #000;
+  color: #00ffea;
+  border: none;
+  outline: none;
+  resize: none;
+  padding: 10px;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+.preview {
+  display: flex;
+  flex-direction: column;
+}
+
+iframe {
+  flex: 1;
+  border: none;
+  background: white;
 }
 </style>
 </head>
 
 <body>
 
-<header>🌌 GALAXIA CODE STUDIO</header>
+<header>🚀 Galaxia Code Studio</header>
 
-<div id="layout">
-
-<div id="editors">
-
-<div class="editor">
-<h3>1️⃣ HTML</h3>
-<textarea id="htmlCode"><h1>Hello Galaxia</h1>
-<p id="msg">Waiting...</p></textarea>
+<div class="controls">
+  <input id="projectName" placeholder="Project name">
+  <button onclick="saveProject()">💾 Save</button>
+  <button onclick="loadProject()">📂 Load</button>
+  <button onclick="run()">▶ Run</button>
 </div>
 
-<div class="editor">
-<h3>2️⃣ CSS</h3>
-<textarea id="cssCode">body{font-family:Arial;text-align:center}
-h1{color:purple}</textarea>
-</div>
+<div class="workspace">
+  <div class="editors">
+    <div class="editor">
+      <label>HTML</label>
+      <textarea id="htmlEditor"><h1>Hello Galaxia</h1></textarea>
+    </div>
+    <div class="editor">
+      <label>CSS</label>
+      <textarea id="cssEditor">body { background:black; color:cyan; }</textarea>
+    </div>
+    <div class="editor">
+      <label>JavaScript</label>
+      <textarea id="jsEditor">console.log("Galaxia ready");</textarea>
+    </div>
+  </div>
 
-<div class="editor">
-<h3>3️⃣ JavaScript</h3>
-<textarea id="jsCode">document.getElementById("msg").innerText="JS Loaded";</textarea>
-</div>
-
-<div class="editor">
-<h3>4️⃣ GalaScript</h3>
-<textarea id="galaCode">
-Say("Welcome to Galaxia")
-SetText("#msg","From GalaScript")
-SetColor("h1","blue")
-</textarea>
-</div>
-
-<div id="controls">
-<button onclick="runAll()">▶ RUN ALL</button>
-</div>
-
-</div>
-
-<div id="preview">
-<iframe id="frame"></iframe>
-</div>
-
+  <div class="preview">
+    <iframe id="preview"></iframe>
+  </div>
 </div>
 
 <script>
-function parseGala(script){
-  let js="";
-  script.split("\n").forEach(line=>{
-    line=line.trim();
-    if(line.startsWith("Say")){
-      const t=line.match(/"(.*)"/)?.[1];
-      js+=`console.log(${JSON.stringify(t)});\n`;
-    }
-    if(line.startsWith("SetText")){
-      const p=line.match(/"(.*?)"/g);
-      if(p) js+=`document.querySelector(${p[0]}).innerText=${p[1]};\n`;
-    }
-    if(line.startsWith("SetColor")){
-      const p=line.match(/"(.*?)"/g);
-      if(p) js+=`document.querySelector(${p[0]}).style.color=${p[1]};\n`;
-    }
-  });
-  return js;
+const htmlEditor = document.getElementById("htmlEditor");
+const cssEditor  = document.getElementById("cssEditor");
+const jsEditor   = document.getElementById("jsEditor");
+const preview    = document.getElementById("preview");
+const projectName = document.getElementById("projectName");
+
+// ---------- RUN ----------
+function run() {
+  const html = htmlEditor.value;
+  const css  = "<style>" + cssEditor.value + "</style>";
+  const js   = "<script>" + jsEditor.value + "<\/script>";
+
+  const doc = `
+    <!DOCTYPE html>
+    <html>
+    <head>${css}</head>
+    <body>
+      ${html}
+      ${js}
+    </body>
+    </html>
+  `;
+
+  preview.srcdoc = doc;
 }
 
-function runAll(){
-  const html=document.getElementById("htmlCode").value;
-  const css=document.getElementById("cssCode").value;
-  const js=document.getElementById("jsCode").value;
-  const gala=document.getElementById("galaCode").value;
+// ---------- SAVE / LOAD ----------
+function saveProject() {
+  const name = projectName.value.trim();
+  if (!name) return alert("Enter project name");
 
-  const galaJS=parseGala(gala);
+  const data = {
+    html: htmlEditor.value,
+    css: cssEditor.value,
+    js: jsEditor.value
+  };
 
-  const doc=`
-<!DOCTYPE html>
-<html>
-<head>
-<style>${css}</style>
-</head>
-<body>
-${html}
-<script>
-${js}
-${galaJS}
-<\/script>
-</body>
-</html>`;
+  localStorage.setItem("galaxia_" + name, JSON.stringify(data));
+  localStorage.setItem("galaxia_last", name);
+  alert("Saved " + name);
+}
 
-  const iframe=document.getElementById("frame");
-  iframe.srcdoc=doc;
+function loadProject() {
+  const name = projectName.value.trim();
+  const raw = localStorage.getItem("galaxia_" + name);
+  if (!raw) return alert("Project not found");
+
+  const data = JSON.parse(raw);
+  htmlEditor.value = data.html;
+  cssEditor.value  = data.css;
+  jsEditor.value   = data.js;
+  run();
+}
+
+// Auto-load last project
+const last = localStorage.getItem("galaxia_last");
+if (last) {
+  projectName.value = last;
+  loadProject();
+} else {
+  run();
 }
 </script>
 
